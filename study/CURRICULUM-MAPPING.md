@@ -1,29 +1,29 @@
-# v3 课程映射（源文档 -> 目标章节）
+# 课程映射（源文档 -> study）
 
-## 1. 映射规则
-- 以 `architect-learning-plan.md` v2 主线作为 Level 骨架
-- 其它文档按四线补充：架构 / 实现 / 学习方法 / 测试
-- 对冲突编号与旧路径仅保留一套 v3 编号
+## 映射原则
+- 主骨架：`architect-learning-plan.md`（Level 0-7）
+- 实践补强：`senior-dev-learning-plan.md`
+- 学习方法补强：`feynman-learning-plan.md`
+- 质量补强：`testing-learning-plan.md`
+- 框架对比补强：`FRAMEWORK-COMPARISON.md`、`NEW-FRAMEWORKS-GUIDE.md`
 
-## 2. 主映射表
-
-| v3 章节 | 主要来源 | 融合内容 |
+## 章节映射
+| study 章节 | 主要来源 | 关键内容 |
 |---|---|---|
-| level0 | architect-learning-plan.md | Agent 基础认知、ReAct 思维 |
-| level1 | architect-learning-plan.md, senior-dev-learning-plan.md | LangGraph 单 Agent 实现与工具基础 |
-| level2 | architect-learning-plan.md, senior-dev-learning-plan.md | 任务规划、执行、反思与记忆系统 |
-| level3 | FRAMEWORK-COMPARISON.md, NEW-FRAMEWORKS-GUIDE.md | 框架对比方法、场景选择、迁移能力 |
-| level4 | architect-learning-plan.md, testing-learning-plan.md | 高级单 Agent、鲁棒性与质量策略 |
-| level5 | architect-learning-plan.md, senior-dev-learning-plan.md, testing-learning-plan.md | 多 Agent 协作模式与测试 |
-| level6 | architect-learning-plan.md, testing-learning-plan.md, README.md | 生产级部署、观测性、安全、CI/CD |
-| level7 | architect-learning-plan.md, feynman-learning-plan.md | 前沿探索与综合项目 |
+| level0 | architect | Agent 基础、ReAct 认知 |
+| level1 | architect + senior-dev | LangGraph 单 Agent、工具调用 |
+| level2 | architect + senior-dev | 规划-执行-反思、任务分解 |
+| level3 | framework docs + feynman | 框架对比、迁移学习、选型 |
+| level4 | architect + testing | 高级记忆、RAG、性能与质量 |
+| level5 | architect + senior-dev + testing | 多 Agent 协作模式与验证 |
+| level6 | architect + testing + README | 生产部署、可观测、安全与门禁 |
+| level7 | architect + feynman | 前沿研究与综合项目闭环 |
 
-## 3. 补充来源
-- `feynman-learning-plan.md`: i+1、费曼解释、类比教学、反思模板
-- `FEYNMAN-UPDATE-SUMMARY.md`: 路径调整动机与框架迁移目标
-- `README.md`: 快速开始、总览结构、目标用户说明
+## 冲突处理
+- 统一采用 Level 0-7 编号
+- 费曼文档中的重复编号不沿用
+- README 旧路径与新路径冲突时，以本目录为准
 
-## 4. 冲突处理记录
-- 已处理：`feynman-learning-plan.md` 中重复 Level 编号（Level 3/4 重复）
-- 已处理：旧版 `README.md` 的 Level 0-5 主线与 v2 路径差异
-- 已处理：OpenClaw/OpenCode 未确认信息，统一标记为“待确认”区
+## 范围声明
+- 本教程不纳入 `app/` 目录
+- `app/` 作为综合案例参考，不作为必修章节
