@@ -1,0 +1,136 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langgraph-learn"
+version = "0.1.0"
+description = "LangGraph 学习项目 - 以工程化、可维护性、生产可用性为目标"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["langgraph", "langchain", "ai-agent", "machine-learning", "llm"]
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    # Core
+    "langgraph>=0.2.0",
+    "langchain>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langchain-anthropic>=0.2.0",
+    
+    # Async
+    "aiohttp>=3.9.0",
+    "aiofiles>=23.2.0",
+    
+    # Data processing
+    "pandas>=2.1.0",
+    "numpy>=1.26.0",
+    
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.12.0",
+    "black>=23.12.0",
+    "isort>=5.13.0",
+    "mypy>=1.8.0",
+    "ruff>=0.1.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.12.0",
+]
+viz = [
+    "graphviz>=0.20.1",
+    "pygraphviz>=0.20.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/langgraph-learn"
+Repository = "https://github.com/yourusername/langgraph-learn"
+Documentation = "https://langgraph-learn.readthedocs.io"
+
+[project.scripts]
+dev = "python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+test = "pytest tests/"
+test-cov = "pytest --cov=app tests/ --cov-report=html"
+format = "black app/ tests/ && isort app/ tests/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*", "tests*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = "tests"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "tests/*",
+    "app/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+select = ["E", "F", "I", "N", "W", "PL"]
+ignore = ["E501"]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.pydantic-settings]
+class Config:
+    env_file = ".env"
+    env_file_encoding = "utf-8"

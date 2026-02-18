@@ -1,0 +1,46 @@
+# LangGraph Learning Project Requirements
+
+# Core dependencies
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langchain-anthropic>=0.2.0
+
+# Async dependencies
+aiohttp>=3.9.0
+aiofiles>=23.2.0
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.26.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.12.0
+
+# Development tools
+black>=23.12.0
+isort>=5.13.0
+mypy>=1.8.0
+ruff>=0.1.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.5.0
+
+# Monitoring and logging
+structlog>=23.2.0
+
+# Optional: For production deployment
+uvicorn>=0.25.0
+gunicorn>=21.2.0
+
+# Optional: For graph visualization
+graphviz>=0.20.1
+pygraphviz>=0.20.1
