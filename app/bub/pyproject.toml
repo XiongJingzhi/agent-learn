@@ -1,0 +1,148 @@
+[project]
+name = "bub"
+version = "0.2.1"
+description = "Bub it. Build it. Tape-first coding agent CLI."
+authors = [{ name = "Chojan Shang", email = "psiace@apache.org" }]
+readme = "README.md"
+keywords = ['python']
+requires-python = ">=3.12,<4.0"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "pyyaml>=6.0.0",
+    "typer>=0.9.0",
+    "republic>=0.3.0",
+    "rich>=13.0.0",
+    "prompt-toolkit>=3.0.0",
+    "python-telegram-bot>=21.0",
+    "html2markdown>=0.1.7",
+    "loguru>=0.7.2",
+    "telegramify-markdown>=0.5.4",
+    "apscheduler>=3.11.2",
+    "aiohttp>=3.13.3",
+    "rapidfuzz>=3.14.1",
+    "discord-py>=2.6.4",
+    "requests>=2.32.5",
+    "python-dotenv>=1.2.1",
+    "any-llm-sdk[anthropic]>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://bub.build"
+Repository = "https://github.com/psiace/bub"
+Documentation = "https://bub.build"
+
+[project.scripts]
+bub = "bub.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.2.0",
+    "tox-uv>=1.11.3",
+    "types-PyYAML>=6.0.12",
+    "mypy>=0.991",
+    "ruff>=0.11.5",
+    "mkdocs>=1.4.2",
+    "mkdocs-terminal>=4.7.0",
+    "mkdocstrings[python]>=0.26.1",
+    "rust-just>=1.42.0",
+    "prek>=0.3.1",
+    "pytest-asyncio>=1.3.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bub"]
+
+[tool.vulture]
+ignore_names = ["test_*", "Test*"]
+paths = ["src"]
+
+[tool.mypy]
+files = ["src"]
+exclude = [
+    '^src/bub/skills/.*$',
+]
+disallow_untyped_defs = false
+disallow_any_unimported = false
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+show_error_codes = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+fix = true
+extend-exclude = [
+    "src/bub/skills",
+    "backup",
+]
+
+[tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E", "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    "TRY",
+]
+ignore = [
+    # LineTooLong
+    "E501",
+    # DoNotAssignLambda
+    "E731",
+    # Avoid noisy exception-message rule for CLI/tool errors
+    "TRY003",
+    "S603",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+"src/bub/tools/builtin.py" = ["C901"]
+
+[tool.ruff.format]
+preview = true
