@@ -1,0 +1,243 @@
+{
+  "dashboard": {
+    "title": "Agent Service Dashboard",
+    "description": "Comprehensive monitoring dashboard for Agent service",
+    "tags": ["agent", "production"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate (QPS)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"agent-service\"}[5m]))",
+            "legendFormat": "Total QPS",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(http_requests_total{job=\"agent-service\",status=~\"2..\"}[5m]))",
+            "legendFormat": "2xx QPS",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(http_requests_total{job=\"agent-service\",status=~\"4..\"}[5m]))",
+            "legendFormat": "4xx QPS",
+            "refId": "C"
+          },
+          {
+            "expr": "sum(rate(http_requests_total{job=\"agent-service\",status=~\"5..\"}[5m]))",
+            "legendFormat": "5xx QPS",
+            "refId": "D"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"agent-service\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"agent-service\"}[5m]))",
+            "legendFormat": "Error Rate",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 0.01, "color": "yellow"},
+                {"value": 0.05, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Response Time Latency",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"agent-service\"}[5m])) by (le))",
+            "legendFormat": "P50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"agent-service\"}[5m])) by (le))",
+            "legendFormat": "P95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"agent-service\"}[5m])) by (le))",
+            "legendFormat": "P99",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Active Connections",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "http_active_connections{job=\"agent-service\"}",
+            "legendFormat": "{{instance}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "LLM Token Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(llm_tokens_total[5m]))",
+            "legendFormat": "Tokens/sec",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(increase(llm_tokens_total[1h]))",
+            "legendFormat": "Tokens/hour",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "API Cost",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(increase(llm_cost_total[1h]))",
+            "legendFormat": "Cost/hour ($)",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(increase(llm_cost_total[24h]))",
+            "legendFormat": "Cost/day ($)",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "CPU Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"agent-prod\"}[5m])) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "CPU",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(container_memory_working_set_bytes{namespace=\"agent-prod\"}) by (pod)",
+            "legendFormat": "{{pod}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Agent Success Rate",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 24},
+        "targets": [
+          {
+            "expr": "sum(rate(agent_requests_total{status=\"success\"}[5m])) / sum(rate(agent_requests_total[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "max": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.9, "color": "yellow"},
+                {"value": 0.95, "color": "green"}
+              ]
+            },
+            "mappings": [
+              {
+                "type": "value",
+                "value": "0.95",
+                "text": "95%"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -20,6 +20,11 @@
 ## 术语统一
 - 使用：`Agent`、`Level`、`LangGraph`、`RAG`、`多 Agent`
 - 使用：`完成标准`，避免混用“毕业标准/通过标准”
+- Skill/Tool/MCP 口径：
+  - `Skill`：目录化能力包（`SKILL.md` + instructions + resources/scripts），按需加载
+  - `Tool`：执行动作的接口/函数（API、数据库、文件操作等）
+  - `MCP`：模型与外部能力通信的协议层
+  - 禁止写法：`Skill = Tool` 或“Tool 就是 Skill”
 
 ## 不确定信息标注
 对于 OpenClaw/OpenCode 等外部框架，统一分区：

@@ -1,0 +1,157 @@
+version: '3.8'
+
+# ============================================
+# Docker Compose - 多容器编排示例
+# ============================================
+
+services:
+  # Agent 服务
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # 数据库配置
+      - DATABASE_URL=postgresql://agent:agent123@db:5432/agentdb
+      # Redis 配置
+      - REDIS_URL=redis://:redis123@redis:6379/0
+      # OpenAI API Key（从环境变量读取）
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # 日志级别
+      - LOG_LEVEL=info
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      # 挂载日志目录
+      - ./logs:/app/logs
+      # 挂载配置文件
+      - ./config:/app/config:ro
+    restart: unless-stopped
+    networks:
+      - agent-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # PostgreSQL 数据库
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=agent
+      - POSTGRES_PASSWORD=agent123
+      - POSTGRES_DB=agentdb
+    volumes:
+      # 数据持久化
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - agent-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass redis123
+    volumes:
+      # 数据持久化
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - agent-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Prometheus - 指标采集
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - agent-network
+
+  # Grafana - 可视化
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    restart: unless-stopped
+    networks:
+      - agent-network
+    depends_on:
+      - prometheus
+
+  # Loki - 日志聚合（可选）
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    networks:
+      - agent-network
+
+  # Promtail - 日志采集（可选）
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+    networks:
+      - agent-network
+
+# 数据卷定义
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+
+# 网络定义
+networks:
+  agent-network:
+    driver: bridge

@@ -1,0 +1,253 @@
+# ============================================
+# Prometheus 告警规则
+# ============================================
+
+groups:
+  # Agent 服务告警
+  - name: agent_service_alerts
+    interval: 30s
+    rules:
+      # 高错误率告警
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5..",job="agent-service"}[5m])) /
+          sum(rate(http_requests_total{job="agent-service"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.job }}"
+          runbook_url: "https://runbooks.example.com/high-error-rate"
+
+      # 高延迟告警
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="agent-service"}[5m])) by (le)) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.job }}"
+
+      # 服务不可用告警
+      - alert: ServiceDown
+        expr: up{job="agent-service"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} on {{ $labels.instance }} is down"
+
+      # QPS 下降告警
+      - alert: LowRequestRate
+        expr: |
+          sum(rate(http_requests_total{job="agent-service"}[5m])) < 10
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Low request rate detected"
+          description: "Request rate is {{ $value }} req/s for {{ $labels.job }}"
+
+  # Kubernetes Pod 告警
+  - name: kubernetes_pod_alerts
+    interval: 30s
+    rules:
+      # Pod CrashLooping
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total{namespace="agent-prod"}[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod is crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+      # Pod Not Ready
+      - alert: PodNotReady
+        expr: |
+          sum by (namespace, pod) (kube_pod_status_phase{namespace="agent-prod", phase!="Running"}) > 0
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod is not ready"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is not ready"
+
+  # 资源使用告警
+  - name: resource_usage_alerts
+    interval: 30s
+    rules:
+      # 高 CPU 使用率
+      - alert: HighCPUUsage
+        expr: |
+          sum(rate(container_cpu_usage_seconds_total{namespace="agent-prod"}[5m])) by (pod) /
+          sum(kube_pod_container_resource_limits{namespace="agent-prod", resource="cpu"}) by (pod) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage detected"
+          description: "Pod {{ $labels.pod }} CPU usage is {{ $value | humanizePercentage }}"
+
+      # 高内存使用率
+      - alert: HighMemoryUsage
+        expr: |
+          sum(container_memory_working_set_bytes{namespace="agent-prod"}) by (pod) /
+          sum(kube_pod_container_resource_limits{namespace="agent-prod", resource="memory"}) by (pod) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage detected"
+          description: "Pod {{ $labels.pod }} memory usage is {{ $value | humanizePercentage }}"
+
+      # 磁盘空间不足
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Disk space low"
+          description: "Disk usage on {{ $labels.instance }} is {{ $value | humanizePercentage }} full"
+
+  # 数据库告警
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # PostgreSQL 连接数过高
+      - alert: PostgresConnectionsHigh
+        expr: |
+          pg_stat_database_numbackends{datname="agentdb"} / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "PostgreSQL connections high"
+          description: "PostgreSQL has {{ $value | humanizePercentage }} of max connections"
+
+      # PostgreSQL 慢查询
+      - alert: PostgresSlowQueries
+        expr: |
+          rate(pg_stat_statements_calls_total{datname="agentdb"}[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "PostgreSQL slow queries detected"
+          description: "PostgreSQL slow query rate is {{ $value }} queries/sec"
+
+  # Redis 告警
+  - name: redis_alerts
+    interval: 30s
+    rules:
+      # Redis 内存使用率过高
+      - alert: RedisMemoryHigh
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}"
+
+      # Redis 连接数过高
+      - alert: RedisConnectionsHigh
+        expr: |
+          redis_connected_clients / redis_config_maxclients > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Redis connections high"
+          description: "Redis has {{ $value | humanizePercentage }} of max connections"
+
+  # 业务指标告警
+  - name: business_metrics_alerts
+    interval: 30s
+    rules:
+      # Agent 成功率下降
+      - alert: LowAgentSuccessRate
+        expr: |
+          sum(rate(agent_requests_total{status="success"}[5m])) /
+          sum(rate(agent_requests_total[5m])) < 0.95
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Agent success rate low"
+          description: "Agent success rate is {{ $value | humanizePercentage }}"
+
+      # LLM Token 使用量异常
+      - alert: HighTokenUsage
+        expr: |
+          sum(increase(llm_tokens_total[1h])) > 100000
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High LLM token usage detected"
+          description: "LLM token usage in last hour: {{ $value }}"
+
+      # 成本异常
+      - alert: HighAPICost
+        expr: |
+          sum(increase(llm_cost_total[1h])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High API cost detected"
+          description: "API cost in last hour: ${{ $value }}"
+
+  # 安全告警
+  - name: security_alerts
+    interval: 30s
+    rules:
+      # 认证失败率过高
+      - alert: HighAuthFailureRate
+        expr: |
+          sum(rate(auth_failures_total[5m])) /
+          sum(rate(auth_attempts_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is {{ $value | humanizePercentage }}"
+
+      # 可疑活动
+      - alert: SuspiciousActivity
+        expr: |
+          sum(increase(rate(requests_total{user_agent=~"bot|crawler"}[5m])[5m])) > 100
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "High rate of bot requests: {{ $value }} req/s"

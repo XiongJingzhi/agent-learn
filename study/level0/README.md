@@ -1,30 +1,43 @@
 # Level 0：Agent 认知地图
 
 ## 学习目标
-建立 Agent 的基础心智模型，理解 Agent 与传统程序的差异、ReAct 循环、工具与记忆的基本作用。
+建立 Agent 基础认知与最小系统思维。
 
 ## 前置条件
-- 能阅读 Python 基础代码
-- 对 LLM 有基本认知
+- 完成上一 Level 的 completion checklist
+- 具备本级 README 中要求的基础能力
 
 ## 核心主题
-- 架构：感知 -> 推理 -> 行动 -> 反馈
-- 实现：最小可运行 Agent 的输入输出流
-- 学习方法：费曼三句解释 + 日常类比
-- 测试：环境验证、最小行为测试
+- 架构：识别系统边界、状态流与职责分层
+- 实现：形成可执行任务、接口约束、故障处理
+- 学习：费曼复述 + 反思记录 + 迁移总结
+- 测试：最小验证 -> 进阶验证 -> 挑战验证
+
+## 文件学习顺序
+1. `PROGRESS.md`
+2. `notes/`（按 00..07 顺序）
+   - **推荐先学**：`07_langchain_basics.md` - LangChain 基础知识
+   - 然后学习 00-06：Agent 核心概念
+3. `examples/`（按 00..08 顺序）
+   - **必学**：`07_langchain_basics.py` - LangChain 实践
+   - **必学**：`08_first_agent.py` - 第一个 Agent
+4. `exercises/01_basic_exercises.md`
+5. `exercises/02_intermediate_exercises.md`
+6. `exercises/03_challenge_projects.md`
+7. `projects/01_capstone_project.md`
+8. `checklists/completion.md`
 
 ## 实践任务
-1. 用 3 句话解释 Agent 与聊天机器人的区别。
-2. 画出一个天气查询 Agent 的流程图。
-3. 列出一个 Agent 的最小工具集与失败场景。
-4. 完成一份基础环境检查记录。
+1. 完成所有 notes 的最小验证。
+2. 完成三层 exercises 并留存证据。
+3. 完成 capstone 交付并通过 checklist。
 
 ## 完成标准
-- 能口头解释 ReAct 的每一步。
-- 能写出最小 Agent 的流程图与关键状态字段。
-- 能说明至少 3 个失败模式与对应保护策略。
+- 所有文档任务有证据链（命令、截图、日志、复盘）。
+- 能解释本级关键设计权衡并回答“为什么这样做”。
+- 能给出进入下一 Level 的准备清单。
 
 ## 常见误区
-- 把 Agent 等同于“会聊天的模型”。
-- 只关注 API 调用，不关注状态与反馈循环。
-- 忽视失败处理与可测试性。
+- 只读不练，缺少可验证产出。
+- 只做 happy path，不覆盖失败路径。
+- 结论没有证据，无法复核与复现。
