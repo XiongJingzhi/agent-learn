@@ -1,7 +1,7 @@
 # 课程映射（源文档 -> study）
 
 ## 映射原则
-- 主骨架：`architect-learning-plan.md`（Level 0-7）
+- 主骨架：`architect-learning-plan.md`（Level 0-6）
 - 实践补强：`senior-dev-learning-plan.md`
 - 学习方法补强：`feynman-learning-plan.md`
 - 质量补强：`testing-learning-plan.md`
