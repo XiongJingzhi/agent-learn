@@ -15,7 +15,6 @@
 - Level 4: [`level4/README.md`](level4/README.md) | [`level4/PROGRESS.md`](level4/PROGRESS.md)
 - Level 5: [`level5/README.md`](level5/README.md) | [`level5/PROGRESS.md`](level5/PROGRESS.md)
 - Level 6: [`level6/README.md`](level6/README.md) | [`level6/PROGRESS.md`](level6/PROGRESS.md)
-- Level 7: [`level7/README.md`](level7/README.md) | [`level7/PROGRESS.md`](level7/PROGRESS.md)
 
 ## 如何学习
 每个 Level 按固定顺序推进：

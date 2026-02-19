@@ -1,7 +1,7 @@
 # Agent 学习教程写作规范
 
 ## 目录约定
-- Level 命名：`level0` 到 `level7`
+- Level 命名：`level0` 到 `level6`
 - 子目录：`notes/`、`exercises/`、`projects/`、`checklists/`
 
 ## 每个 Level README 固定结构

@@ -17,10 +17,9 @@
 | level4 | architect + testing | 高级记忆、RAG、性能与质量 |
 | level5 | architect + senior-dev + testing | 多 Agent 协作模式与验证 |
 | level6 | architect + testing + README | 生产部署、可观测、安全与门禁 |
-| level7 | architect + feynman | 前沿研究与综合项目闭环 |
 
 ## 冲突处理
-- 统一采用 Level 0-7 编号
+- 统一采用 Level 0-6 编号
 - 费曼文档中的重复编号不沿用
 - README 旧路径与新路径冲突时，以本目录为准
 
